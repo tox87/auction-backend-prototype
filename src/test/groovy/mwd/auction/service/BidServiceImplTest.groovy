@@ -1,10 +1,8 @@
 package mwd.auction.service
 
-import ch.qos.logback.classic.Logger
 import mwd.auction.domain.Bid
 import mwd.auction.domain.Product
 import mwd.auction.domain.User
-import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 import java.time.LocalDateTime
