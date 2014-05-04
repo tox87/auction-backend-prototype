@@ -2,7 +2,7 @@ package mwd.auction.service;
 
 import mwd.auction.domain.User;
 
-public interface NotificationService {
+public interface INotificationService {
 
     void sendOverbiddenNotification(User user);
 

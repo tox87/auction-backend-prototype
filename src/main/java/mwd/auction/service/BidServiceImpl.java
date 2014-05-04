@@ -9,31 +9,31 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BidServiceImpl implements BidService {
+public class BidServiceImpl implements IBidService {
 
     private List<Bid> bids = new ArrayList<>();
 
-    private NotificationService notificationService;
+    private INotificationService INotificationService;
 
-    public BidServiceImpl(NotificationService notificationService) {
-        this.notificationService = notificationService;
+    public BidServiceImpl(INotificationService INotificationService) {
+        this.INotificationService = INotificationService;
     }
 
     @Override
     public void placeBid(Bid newBid) {
 
         if (newBid.getProduct().getAuctionEndTime().isBefore(newBid.getBidTime())) {
-            notificationService.sendBiddingHasEndedNotification(newBid.getUser());
+            INotificationService.sendBiddingHasEndedNotification(newBid.getUser());
             return;
         }
 
         if (newBid.getProduct().getMinimalPrice().compareTo(newBid.getAmount()) > 0) {
-            notificationService.sendLessThenMinProductPriceNotification(newBid.getUser());
+            INotificationService.sendLessThenMinProductPriceNotification(newBid.getUser());
             return;
         }
 
         if (newBid.getProduct().getReservedPrice().compareTo(newBid.getAmount()) < 0) {
-            notificationService.sendWinningNotification(newBid.getUser());
+            INotificationService.sendWinningNotification(newBid.getUser());
             /* product sold out for reservedPrice, so end product bidding with time of winning bid,
             so that all subsequent bids will be rejected by auctionEndTime condition */
             newBid.getProduct().setAuctionEndTime(newBid.getBidTime());
@@ -46,7 +46,7 @@ public class BidServiceImpl implements BidService {
 
         if (winningBid != null) {
             if (winningBid.getAmount().compareTo(newBid.getAmount()) >= 0) {
-                    notificationService.sendLessThenMaxBidNotification(newBid.getUser());
+                    INotificationService.sendLessThenMaxBidNotification(newBid.getUser());
                     return;
             }
             //current bid is no longer winning, since new bid amount is higher
@@ -79,6 +79,6 @@ public class BidServiceImpl implements BidService {
                 .map(Bid::getUser)
                 .filter(User::isGetOverbidNotifications)
                 .distinct()
-                .forEach(notificationService::sendOverbiddenNotification);
+                .forEach(INotificationService::sendOverbiddenNotification);
     }
 }

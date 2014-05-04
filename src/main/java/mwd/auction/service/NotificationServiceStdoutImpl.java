@@ -2,7 +2,7 @@ package mwd.auction.service;
 
 import mwd.auction.domain.User;
 
-public class NotificationServiceStdoutImpl implements NotificationService {
+public class NotificationServiceStdoutImpl implements INotificationService {
 
     private interface NotificationMessage {
         String OVERBIDDEN = "%s, Your bid was overbidden\n";

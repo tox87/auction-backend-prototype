@@ -7,12 +7,9 @@ import spock.lang.Specification
 
 import java.time.LocalDateTime
 
-/**
- * Created by Tox on 27.04.2014.
- */
 class BidServiceImplTest extends Specification {
 
-    NotificationService notificationService
+    INotificationService notificationService
     BidServiceImpl bidService
 
     def setup() {

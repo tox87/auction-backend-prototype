@@ -6,7 +6,7 @@ import mwd.auction.domain.Product;
 import java.util.List;
 
 
-public interface BidService {
+public interface IBidService {
 
     void placeBid(Bid newBid);
 

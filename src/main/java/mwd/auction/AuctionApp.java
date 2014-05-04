@@ -3,8 +3,8 @@ package mwd.auction;
 import mwd.auction.domain.Bid;
 import mwd.auction.domain.Product;
 import mwd.auction.domain.User;
-import mwd.auction.service.BidService;
 import mwd.auction.service.BidServiceImpl;
+import mwd.auction.service.IBidService;
 import mwd.auction.service.NotificationServiceStdoutImpl;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public class AuctionApp extends TimerTask {
 
     private Timer timer;
     private int bidCounter = 0;
-    private BidService bidService;
+    private IBidService IBidService;
 
     public AuctionApp(int auctionBidLimit, int bidDelayMillis) {
         this.auctionBidLimit = auctionBidLimit;
@@ -36,7 +36,7 @@ public class AuctionApp extends TimerTask {
     }
 
     private void initServices() {
-        bidService = new BidServiceImpl(new NotificationServiceStdoutImpl());
+        IBidService = new BidServiceImpl(new NotificationServiceStdoutImpl());
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -63,7 +63,7 @@ public class AuctionApp extends TimerTask {
     public void run() {
         Bid bid = buildRandomBid();
         printBid(bid);
-        bidService.placeBid(bid);
+        IBidService.placeBid(bid);
         if (++bidCounter == auctionBidLimit) {
             stopAuction();
             printSortedBidListPerProduct();
@@ -116,7 +116,7 @@ public class AuctionApp extends TimerTask {
     private void printSortedBidListPerProduct() {
         products.stream().forEach( p -> {
             System.out.println("Accepted bids for " + p.getTitle());
-            bidService.getProductBidsSortedByPriceDesc(p).stream()
+            IBidService.getProductBidsSortedByPriceDesc(p).stream()
                     .forEach(b -> System.out.println(b.getAmount() + " - " + b.getUser().getName()));
         });
     }
