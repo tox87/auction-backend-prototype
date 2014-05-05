@@ -5,6 +5,7 @@ import mwd.auction.domain.Product;
 import mwd.auction.domain.User;
 import mwd.auction.service.BidServiceImpl;
 import mwd.auction.service.IBidService;
+import mwd.auction.service.INotificationService;
 import mwd.auction.service.NotificationServiceStdoutImpl;
 
 import java.math.BigDecimal;
@@ -18,44 +19,45 @@ public class AuctionApp extends TimerTask {
 
     private List<User> users = new ArrayList<>();
     private List<Product> products = new ArrayList<>();
-
-    private Random random;
+    private Random random = new Random();
 
     private Timer timer;
-    private int bidCounter = 0;
+    private int bidCounter;
+
     private IBidService bidService;
 
-    public AuctionApp(int auctionBidLimit, int bidDelayMillis) {
-        this.auctionBidLimit = auctionBidLimit;
-        this.bidDelayMillis = bidDelayMillis;
-        this.random = new Random();
+    public AuctionApp() {
         initServices();
         addProducts();
         addUsers();
     }
 
     private void initServices() {
-        bidService = new BidServiceImpl(new NotificationServiceStdoutImpl());
+        INotificationService notificationService = new NotificationServiceStdoutImpl();
+        bidService = new BidServiceImpl(notificationService);
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        new AuctionApp(10, 1000).startAuction();
+    public static void main(String[] args) {
+        new AuctionApp().startAuction(10, 1000);
     }
 
-    public void startAuction() {
-        System.out.println("*** Auction started ***");
+    public void startAuction(int auctionBidLimit, int bidDelayMillis) {
+        this.auctionBidLimit = auctionBidLimit;
+        this.bidDelayMillis = bidDelayMillis;
+
+        printAuctionStartedMessage();
         printAuctionParams();
+        resetBidCounter();
+        initTimerAndScheduleBiddingTask();
+    }
+
+    private void resetBidCounter() {
+        bidCounter = 0;
+    }
+
+    private void initTimerAndScheduleBiddingTask() {
         timer = new Timer();
         timer.schedule(this, 0, bidDelayMillis);
-    }
-
-    private void stopAuction() {
-        timer.cancel();
-        System.out.println("*** Auction stopped ***");
-    }
-
-    private void printAuctionParams() {
-        System.out.printf("*** %d bids will be placed with %d ms delay ***%n", auctionBidLimit, bidDelayMillis);
     }
 
     @Override
@@ -69,12 +71,30 @@ public class AuctionApp extends TimerTask {
         }
     }
 
+    private void stopAuction() {
+        stopScheduledBiddingTask();
+        printAuctionStoppedMessage();
+    }
+
+    private void stopScheduledBiddingTask() {
+        timer.cancel();
+    }
+
+    private void printAuctionStartedMessage() {
+        System.out.println("*** Auction started ***");
+    }
+
+    private void printAuctionStoppedMessage() {
+        System.out.println("*** Auction stopped ***");
+    }
+
+    private void printAuctionParams() {
+        System.out.printf("*** %d bids will be placed with %d ms delay ***%n", auctionBidLimit, bidDelayMillis);
+    }
+
     private void printBid(Bid bid) {
-        System.out.printf("placing new bid #%d from %s on %s amount=%s%n",
-                bid.getId(),
-                bid.getUser().getName(),
-                bid.getProduct().getTitle(),
-                bid.getAmount());
+        System.out.printf("placing new bid #%d from %s on %s amount=%s%n", bid.getId(), bid.getUser().getName(),
+                bid.getProduct().getTitle(), bid.getAmount());
     }
 
     private Bid buildRandomBid() {
@@ -94,7 +114,6 @@ public class AuctionApp extends TimerTask {
     }
 
     private BigDecimal getRandomBidAmount(Product randomProduct) {
-        // allows random amounts greater then product reserved price.
         BigDecimal overbidFactor = new BigDecimal("1.1");
         int bidAmountUpperBound = randomProduct.getReservedPrice().multiply(overbidFactor).intValue();
         return BigDecimal.valueOf(random.nextInt(bidAmountUpperBound));
