@@ -76,6 +76,14 @@ public class AuctionApp extends TimerTask {
         printAuctionStoppedMessage();
     }
 
+    private void printSortedBidListPerProduct() {
+        products.stream().forEach( p -> {
+            System.out.println("Accepted bids for " + p.getTitle());
+            bidService.getProductBidsSortedByPriceDesc(p).stream()
+                    .forEach(b -> System.out.println(b.getAmount() + " - " + b.getUser().getName()));
+        });
+    }
+
     private void stopScheduledBiddingTask() {
         timer.cancel();
     }
@@ -113,10 +121,9 @@ public class AuctionApp extends TimerTask {
         return bid;
     }
 
-    private BigDecimal getRandomBidAmount(Product randomProduct) {
-        BigDecimal overbidFactor = new BigDecimal("1.1");
-        int bidAmountUpperBound = randomProduct.getReservedPrice().multiply(overbidFactor).intValue();
-        return BigDecimal.valueOf(random.nextInt(bidAmountUpperBound));
+    private User getRandomUser() {
+        int randomUserIndex = random.nextInt(users.size());
+        return users.get(randomUserIndex);
     }
 
     private Product getRandomProduct() {
@@ -124,17 +131,10 @@ public class AuctionApp extends TimerTask {
         return products.get(randomProductIndex);
     }
 
-    private User getRandomUser() {
-        int randomUserIndex = random.nextInt(users.size());
-        return users.get(randomUserIndex);
-    }
-
-    private void printSortedBidListPerProduct() {
-        products.stream().forEach( p -> {
-            System.out.println("Accepted bids for " + p.getTitle());
-            bidService.getProductBidsSortedByPriceDesc(p).stream()
-                    .forEach(b -> System.out.println(b.getAmount() + " - " + b.getUser().getName()));
-        });
+    private BigDecimal getRandomBidAmount(Product randomProduct) {
+        BigDecimal overbidFactor = new BigDecimal("1.1");
+        int bidAmountUpperBound = randomProduct.getReservedPrice().multiply(overbidFactor).intValue();
+        return BigDecimal.valueOf(random.nextInt(bidAmountUpperBound));
     }
 
     private void addUsers() {
@@ -156,7 +156,7 @@ public class AuctionApp extends TimerTask {
     private void addProducts() {
         Product p1 = new Product();
         p1.setId(1);
-        p1.setTitle("Green Apple");
+        p1.setTitle("Golden Apple");
         p1.setAuctionEndTime(LocalDateTime.now().plusHours(1));
         p1.setReservedPrice(new BigDecimal("1000"));
         p1.setMinimalPrice(new BigDecimal("100"));
