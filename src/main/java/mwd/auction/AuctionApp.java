@@ -25,7 +25,7 @@ public class AuctionApp extends TimerTask {
 
     private Timer timer;
     private int bidCounter = 0;
-    private IBidService IBidService;
+    private IBidService bidService;
 
     public AuctionApp(int auctionBidLimit, int bidDelayMillis) {
         this.auctionBidLimit = auctionBidLimit;
@@ -36,7 +36,7 @@ public class AuctionApp extends TimerTask {
     }
 
     private void initServices() {
-        IBidService = new BidServiceImpl(new NotificationServiceStdoutImpl());
+        bidService = new BidServiceImpl(new NotificationServiceStdoutImpl());
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -63,7 +63,7 @@ public class AuctionApp extends TimerTask {
     public void run() {
         Bid bid = buildRandomBid();
         printBid(bid);
-        IBidService.placeBid(bid);
+        bidService.placeBid(bid);
         if (++bidCounter == auctionBidLimit) {
             stopAuction();
             printSortedBidListPerProduct();
@@ -116,7 +116,7 @@ public class AuctionApp extends TimerTask {
     private void printSortedBidListPerProduct() {
         products.stream().forEach( p -> {
             System.out.println("Accepted bids for " + p.getTitle());
-            IBidService.getProductBidsSortedByPriceDesc(p).stream()
+            bidService.getProductBidsSortedByPriceDesc(p).stream()
                     .forEach(b -> System.out.println(b.getAmount() + " - " + b.getUser().getName()));
         });
     }
