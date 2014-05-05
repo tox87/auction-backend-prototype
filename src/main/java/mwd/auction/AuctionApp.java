@@ -9,11 +9,7 @@ import mwd.auction.service.NotificationServiceStdoutImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 
 public class AuctionApp extends TimerTask {
 
@@ -23,6 +19,8 @@ public class AuctionApp extends TimerTask {
     private List<User> users = new ArrayList<>();
     private List<Product> products = new ArrayList<>();
 
+    private Random random;
+
     private Timer timer;
     private int bidCounter = 0;
     private IBidService bidService;
@@ -30,6 +28,7 @@ public class AuctionApp extends TimerTask {
     public AuctionApp(int auctionBidLimit, int bidDelayMillis) {
         this.auctionBidLimit = auctionBidLimit;
         this.bidDelayMillis = bidDelayMillis;
+        this.random = new Random();
         initServices();
         addProducts();
         addUsers();
@@ -97,19 +96,17 @@ public class AuctionApp extends TimerTask {
     private BigDecimal getRandomBidAmount(Product randomProduct) {
         // allows random amounts greater then product reserved price.
         BigDecimal overbidFactor = new BigDecimal("1.1");
-
-        int bidAmountLowerBound = 0;
         int bidAmountUpperBound = randomProduct.getReservedPrice().multiply(overbidFactor).intValue();
-        return BigDecimal.valueOf(ThreadLocalRandom.current().nextInt(bidAmountLowerBound, bidAmountUpperBound));
+        return BigDecimal.valueOf(random.nextInt(bidAmountUpperBound));
     }
 
     private Product getRandomProduct() {
-        int randomProductIndex = ThreadLocalRandom.current().nextInt(0, products.size());
+        int randomProductIndex = random.nextInt(products.size());
         return products.get(randomProductIndex);
     }
 
     private User getRandomUser() {
-        int randomUserIndex = ThreadLocalRandom.current().nextInt(0, users.size());
+        int randomUserIndex = random.nextInt(users.size());
         return users.get(randomUserIndex);
     }
 
