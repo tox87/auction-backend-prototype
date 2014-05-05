@@ -1,3 +1,11 @@
+/*
+ * Created by Mikhail Danilov
+ */
+
+/*
+ * Created by Mikhail Danilov
+ */
+
 package mwd.auction.service
 
 import mwd.auction.domain.Bid

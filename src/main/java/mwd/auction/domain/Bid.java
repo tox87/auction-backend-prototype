@@ -1,3 +1,7 @@
+/*
+ * Created by Mikhail Danilov
+ */
+
 package mwd.auction.domain;
 
 import java.math.BigDecimal;

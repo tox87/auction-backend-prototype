@@ -1,3 +1,7 @@
+/*
+ * Created by Mikhail Danilov
+ */
+
 package mwd.auction;
 
 import mwd.auction.domain.Bid;
